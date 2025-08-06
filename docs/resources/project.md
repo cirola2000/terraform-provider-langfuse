@@ -29,6 +29,21 @@ resource "langfuse_project" "example" {
 }
 ```
 
+### With No Retention Limit
+
+```hcl
+resource "langfuse_project" "unlimited" {
+  name = "unlimited-retention-project"
+  
+  metadata = {
+    environment = "production"
+    type        = "long-term-storage"
+  }
+  
+  retention_days = 0  # No retention limit
+}
+```
+
 ### With Variable Configuration
 
 ```hcl
@@ -42,7 +57,7 @@ variable "project_config" {
   default = {
     name           = "my-project"
     environment    = "production"
-    retention_days = 30
+    retention_days = 0  # No retention limit
   }
 }
 
@@ -67,7 +82,7 @@ resource "langfuse_project" "example" {
 ### Optional
 
 - `metadata` (Map of String) Key-value pairs to store additional information about the project. Useful for tagging, categorization, and organization.
-- `retention_days` (Number) Number of days to retain project data. Defaults to 30 days.
+- `retention_days` (Number) Number of days to retain project data. Set to 0 for no retention limit. Defaults to 0 (no retention limit).
 
 ### Read-Only
 

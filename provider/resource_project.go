@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -64,8 +65,10 @@ func (r *ProjectResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Optional:            true,
 			},
 			"retention_days": schema.Int64Attribute{
-				MarkdownDescription: "Number of days to retain data. Must be 0 or at least 3 days.",
+				MarkdownDescription: "Number of days to retain data. Set to 0 for no retention limit.",
 				Optional:            true,
+				Computed:            true,
+				Default:             int64default.StaticInt64(0),
 			},
 			"created_at": schema.StringAttribute{
 				Computed:            true,
