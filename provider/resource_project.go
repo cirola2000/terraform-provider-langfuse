@@ -141,20 +141,30 @@ func (r *ProjectResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	// Update model with response data
+	// Store the project ID first
 	data.ID = types.StringValue(project.ID)
-	data.Name = types.StringValue(project.Name)
-	data.CreatedAt = types.StringValue(project.CreatedAt)
-	data.UpdatedAt = types.StringValue(project.UpdatedAt)
 
-	if project.RetentionDays != nil {
-		data.RetentionDays = types.Int64Value(int64(*project.RetentionDays))
+	// Read the project back to ensure we have all computed fields properly set
+	// This fixes issues where the API create response doesn't include all fields
+	readProject, err := r.client.GetProject(project.ID)
+	if err != nil {
+		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read project after creation, got error: %s", err))
+		return
+	}
+
+	// Update model with complete data from read operation
+	data.Name = types.StringValue(readProject.Name)
+	data.CreatedAt = types.StringValue(readProject.CreatedAt)
+	data.UpdatedAt = types.StringValue(readProject.UpdatedAt)
+
+	if readProject.RetentionDays != nil {
+		data.RetentionDays = types.Int64Value(int64(*readProject.RetentionDays))
 	}
 
 	// Handle metadata response
-	if project.Metadata != nil && len(project.Metadata) > 0 {
+	if readProject.Metadata != nil && len(readProject.Metadata) > 0 {
 		metadataElements := make(map[string]types.String)
-		for key, value := range project.Metadata {
+		for key, value := range readProject.Metadata {
 			if strValue, ok := value.(string); ok {
 				metadataElements[key] = types.StringValue(strValue)
 			}
