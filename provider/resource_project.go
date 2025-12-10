@@ -73,10 +73,16 @@ func (r *ProjectResource) Schema(ctx context.Context, req resource.SchemaRequest
 			"created_at": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "Project creation timestamp",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"updated_at": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "Project last update timestamp",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -274,6 +280,7 @@ func (r *ProjectResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	// Update model with response data
 	data.Name = types.StringValue(project.Name)
+	data.CreatedAt = types.StringValue(project.CreatedAt)
 	data.UpdatedAt = types.StringValue(project.UpdatedAt)
 
 	if project.RetentionDays != nil {
@@ -319,4 +326,4 @@ func (r *ProjectResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 func (r *ProjectResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-} 
+}
